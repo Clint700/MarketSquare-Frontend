@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 
-export default function HomeScreen() {
+export default function ProfileScreen() {
   const { user, role } = useAuth();
 
   return (
