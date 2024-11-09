@@ -1,20 +1,24 @@
-import { NavigationContainer } from "@react-navigation/native";
-import { AuthProvider, useAuth } from "../contexts/AuthContext";
-import AuthStack from "./AuthStack";
-import MainTabNavigator from "./MainTabNavigator";
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AuthStack from './AuthStack';
+import MainTabNavigator from './MainTabNavigator';
+import { useAuth } from '../contexts/AuthContext';
+import { RootStackParamList } from '../types';
 
-export default function AppNavigator() {
-  return (
-    <AuthProvider>
-      <NavigationContainer>
-        <RootNavigator />
-      </NavigationContainer>
-    </AuthProvider>
-  );
-}
+const RootStack = createNativeStackNavigator<RootStackParamList>();
 
-function RootNavigator() {
+export default function RootNavigator() {
   const { user } = useAuth();
 
-  return user ? <MainTabNavigator /> : <AuthStack />;
+  return (
+    <NavigationContainer>
+      <RootStack.Navigator screenOptions={{ headerShown: false }}>
+        {user ? (
+          <RootStack.Screen name="MainTabNavigator" component={MainTabNavigator} />
+        ) : (
+          <RootStack.Screen name="AuthStack" component={AuthStack} />
+        )}
+      </RootStack.Navigator>
+    </NavigationContainer>
+  );
 }

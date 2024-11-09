@@ -8,7 +8,7 @@ const getAuthHeaders = async () => {
   const role = await AsyncStorage.getItem("userRole");
   return {
     Authorization: `Bearer ${token}`,
-    Role: role || "user",
+    role: role || "customer",
   };
 };
 
@@ -16,8 +16,24 @@ export const login = (username: string, password: string) => {
   return axios.post(`${API_URL}/auth/login`, { username, password });
 };
 
-export const register = (username: string, password: string, email: string) => {
-  return axios.post(`${API_URL}/auth/register`, { username, password, email });
+export const register = (
+  username: string,
+  password: string,
+  firstName: string,
+  lastName: string,
+  email: string,
+  number: string,
+  role: string,
+) => {
+  return axios.post(`${API_URL}/auth/register`, {
+    username,
+    password,
+    first_name: firstName,
+    last_name: lastName,
+    email,
+    number,
+    role,
+  });
 };
 
 export const getProtectedData = async () => {

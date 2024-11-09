@@ -6,7 +6,12 @@ type AuthContextType = {
   user: any;
   role: string | null;
   signIn: (username: string, password: string) => Promise<void>;
-  signUp: (username: string, password: string, email: string) => Promise<void>;
+  signUp: (username: string,
+    password: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    number: string) => Promise<void>;
   signOut: () => void;
 };
 
@@ -30,18 +35,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
   };
 
-  const signUp = (username: string, password: string, email: string) => {
-    return register(username, password, email)
-      .then((response) => {
-        setUser(response.data.user);
-        setRole(response.data.user.role);
-        AsyncStorage.setItem("authToken", response.data.token);
-        AsyncStorage.setItem("userRole", response.data.user.role);
-      })
-      .catch((error) => {
-        console.error("Signup error:", error);
-        throw new Error("Signup failed");
-      });
+  const signUp = (
+    username: string,
+    password: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    number: string
+  ) => {
+    const role = "customer"; // Default role for new sign-ups
+    return register(username, password, firstName, lastName, email, number, role).then((response) => {
+      const { user: userData, token } = response.data;
+      setUser({ ...userData, token });
+      AsyncStorage.setItem("authToken", token);
+      AsyncStorage.setItem("userRole", userData.role);
+    });
   };
 
   const signOut = () => {
