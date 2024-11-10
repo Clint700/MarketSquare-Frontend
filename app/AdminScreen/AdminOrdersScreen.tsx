@@ -1,56 +1,58 @@
-import { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  ActivityIndicator,
-} from "react-native";
-import axios from "axios";
-import { useAuth } from "../../contexts/AuthContext";
+import React, { useEffect, useState } from 'react';
+import { View, FlatList, ActivityIndicator, Alert, StyleSheet } from 'react-native';
+import AdminOrderCard from '../AdminScreen/AdminComponents/AdminOrderCard';
+import { fetchAdminOrders } from '../../services/adminService';
+import { useAuth } from '../../contexts/AuthContext';
 
-export default function AdminOrdersScreen() {
+const AdminOrderScreen = () => {
   const { user } = useAuth();
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get("https://marketsquare-backend-6yy4.onrender.com/api/admin/orders", {
-        headers: { Authorization: `Bearer ${user?.token}` },
-      })
-      .then((response) => {
+    if (user?.role === 'admin') {
+      fetchOrders();
+    } else {
+      Alert.alert('Access Denied', 'Only admins can access this screen.');
+    }
+  }, [user?.role]);
+
+  const fetchOrders = () => {
+    setLoading(true);
+    fetchAdminOrders()
+      .then(response => {
         setOrders(response.data);
+        setLoading(false);
       })
-      .finally(() => setLoading(false));
-  }, []);
+      .catch(error => {
+        console.error('Error fetching orders:', error);
+        Alert.alert('Error', 'Failed to load orders.');
+        setLoading(false);
+      });
+  };
 
   if (loading) {
-    return <ActivityIndicator style={styles.loading} />;
+    return <ActivityIndicator style={styles.loader} size="large" color="#007BFF" />;
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>All Orders</Text>
-      <FlatList
-        data={orders}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.order}>
-            <Text>Order ID: {item.id}</Text>
-            <Text>User ID: {item.user_id}</Text>
-            <Text>Status: {item.status}</Text>
-            <Text>Total: ${item.total_amount}</Text>
-          </View>
-        )}
-      />
-    </View>
+    <FlatList
+      data={orders}
+      keyExtractor={(item) => item.order_id.toString()}
+      renderItem={({ item }) => <AdminOrderCard order={item} />}
+      contentContainerStyle={styles.listContainer}
+    />
   );
-}
+};
+
+export default AdminOrderScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  header: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
-  order: { padding: 15, borderBottomWidth: 1, borderBottomColor: "#ccc" },
-  loading: { flex: 1, justifyContent: "center" },
+  listContainer: {
+    padding: 20,
+  },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+  },
 });
