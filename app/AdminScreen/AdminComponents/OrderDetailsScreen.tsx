@@ -1,11 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, ActivityIndicator, StyleSheet, Alert, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  ActivityIndicator,
+  StyleSheet,
+  Alert,
+  TextInput,
+} from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { updateOrderStatus } from "../../../services/adminService";
 import { fetchOrderById } from "../../../services/adminService";
 import { RootStackParamList } from "../../../navigation/MainTabNavigator";
 
-type OrderDetailsScreenRouteProp = RouteProp<RootStackParamList, "OrderDetails">;
+type OrderDetailsScreenRouteProp = RouteProp<
+  RootStackParamList,
+  "OrderDetails"
+>;
 
 interface OrderDetailsScreenProps {
   route: OrderDetailsScreenRouteProp;
@@ -24,8 +35,6 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({ route }) => {
   const fetchOrderDetails = async () => {
     setLoading(true);
     try {
-      // Fetch the current order details using a GET request if available in services
-      // assuming you have fetchOrderById (this is omitted here for brevity)
       const response = await fetchOrderById(Number(order_id));
       setOrder(response.data);
     } catch (error) {
@@ -40,7 +49,7 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({ route }) => {
     setLoading(true);
     try {
       const response = await updateOrderStatus(Number(order_id), newStatus);
-      setOrder(response.data); // Update order data with the latest status
+      setOrder(response.data);
       Alert.alert("Success", "Order status updated successfully.");
     } catch (error) {
       console.error("Error updating order status:", error);
@@ -67,7 +76,7 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({ route }) => {
       <Text style={styles.detail}>User ID: {order.user_id}</Text>
       <Text style={styles.detail}>Total Amount: ${order.total_amount}</Text>
       <Text style={styles.detail}>Status: {order.status}</Text>
-      
+
       <TextInput
         style={styles.input}
         placeholder="Enter new status"

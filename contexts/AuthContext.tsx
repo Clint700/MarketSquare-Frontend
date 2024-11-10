@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { login, register } from "../services/authService";
 
@@ -23,14 +29,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<string | null>(null);
 
-  // Load token and role from AsyncStorage on startup
   useEffect(() => {
     const loadUserData = async () => {
       try {
         const storedToken = await AsyncStorage.getItem("authToken");
         const storedRole = await AsyncStorage.getItem("userRole");
         const storedUser = await AsyncStorage.getItem("userData");
-        
+
         if (storedToken && storedRole && storedUser) {
           setUser(JSON.parse(storedUser));
           setRole(storedRole);
@@ -51,7 +56,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(userData);
       setRole(userData.role);
 
-      // Save to AsyncStorage for persistence
       await AsyncStorage.setItem("authToken", token);
       await AsyncStorage.setItem("userRole", userData.role);
       await AsyncStorage.setItem("userData", JSON.stringify(userData));
@@ -70,14 +74,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     number: string
   ) => {
     try {
-      const response = await register(username, password, firstName, lastName, email, number, "customer");
+      const response = await register(
+        username,
+        password,
+        firstName,
+        lastName,
+        email,
+        number,
+        "customer"
+      );
       const userData = response.data.user;
       const token = response.data.token;
 
       setUser(userData);
       setRole("customer");
 
-      // Save to AsyncStorage for persistence
       await AsyncStorage.setItem("authToken", token);
       await AsyncStorage.setItem("userRole", "customer");
       await AsyncStorage.setItem("userData", JSON.stringify(userData));
@@ -90,7 +101,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     setUser(null);
     setRole(null);
-    // Remove all persisted data
     await AsyncStorage.removeItem("authToken");
     await AsyncStorage.removeItem("userRole");
     await AsyncStorage.removeItem("userData");

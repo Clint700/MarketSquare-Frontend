@@ -4,7 +4,10 @@ import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../navigation/MainTabNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
 
-type AdminOrderCardNavigationProp = StackNavigationProp<RootStackParamList, "OrderDetails">;
+type AdminOrderCardNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "OrderDetails"
+>;
 
 interface AdminOrderCardProps {
   order: {
