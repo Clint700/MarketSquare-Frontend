@@ -1,16 +1,15 @@
 import React from "react";
-import { View, Text, Button, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { useAuth } from "../../contexts/AuthContext";
-import { LinearGradient } from "expo-linear-gradient"; // Make sure to install 'expo-linear-gradient' if not done
-
+import { LinearGradient } from "expo-linear-gradient"; 
 export default function AdminDashboard() {
   const { user, signOut } = useAuth();
 
   return (
-    <LinearGradient colors={["#6a11cb", "#2575fc"]} style={styles.gradientContainer}>
+    <LinearGradient colors={["#e0e0e0", "#f5f5f5"]} style={styles.gradientContainer}>
       <View style={styles.container}>
         <Image
-          source={{ uri: user?.profileImage || "https://via.placeholder.com/100" }}
+          source={{ uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC0EDEBwYBnBuEt5RfgAN1Oc9fw7IKZAs67g&s" }}
           style={styles.profileImage}
         />
         <Text style={styles.header}>Welcome, {user?.firstName || user?.name || "Admin"}</Text>
@@ -20,27 +19,22 @@ export default function AdminDashboard() {
             <Text style={styles.infoLabel}>First Name:</Text>
             <Text style={styles.infoValue}>{user?.first_name || "N/A"}</Text>
           </View>
-
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Last Name:</Text>
             <Text style={styles.infoValue}>{user?.last_name || "N/A"}</Text>
           </View>
-
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Username:</Text>
             <Text style={styles.infoValue}>{user?.username || "N/A"}</Text>
           </View>
-
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Email:</Text>
             <Text style={styles.infoValue}>{user?.email || "N/A"}</Text>
           </View>
-
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Phone Number:</Text>
             <Text style={styles.infoValue}>{user?.number || "N/A"}</Text>
           </View>
-
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Role:</Text>
             <Text style={styles.infoValue}>{user?.role || "N/A"}</Text>
@@ -71,13 +65,13 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     marginBottom: 20,
-    borderWidth: 3,
-    borderColor: "#fff",
+    borderWidth: 2,
+    borderColor: "#ddd",
   },
   header: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#fff",
+    fontSize: 26,
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 20,
     textAlign: "center",
   },
@@ -87,10 +81,10 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 20,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
     shadowRadius: 6,
-    elevation: 8,
+    elevation: 6,
     marginBottom: 20,
   },
   infoRow: {
@@ -102,24 +96,24 @@ const styles = StyleSheet.create({
     borderBottomColor: "#e0e0e0",
   },
   infoLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#888",
+    fontSize: 15,
+    fontWeight: "500",
+    color: "#666",
   },
   infoValue: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
+    fontSize: 16,
+    color: "#444",
+    fontWeight: "600",
   },
   logoutButton: {
     marginTop: 20,
-    backgroundColor: "#ff5252",
+    backgroundColor: "#888",
     paddingVertical: 10,
     paddingHorizontal: 40,
     borderRadius: 25,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.25,
     shadowRadius: 5,
     elevation: 5,
   },

@@ -1,4 +1,3 @@
-import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { useAuth } from "../contexts/AuthContext";
@@ -12,6 +11,7 @@ import ManageUsersScreen from "../app/AdminScreen/ManageUsersScreen";
 import AdminOrdersScreen from "../app/AdminScreen/AdminOrdersScreen";
 import OrderDetailsScreen from "../app/AdminScreen/AdminComponents/OrderDetailsScreen";
 import AdminProductsScreen from "../app/AdminScreen/AdminProductsScreen";
+import { Ionicons } from "@expo/vector-icons";
 
 export type RootStackParamList = {
   AdminDashboard: undefined;
@@ -34,7 +34,7 @@ function AdminStack() {
       <Stack.Screen
         name="AdminDashboard"
         component={AdminDashboard}
-        options={{ title: "Dashboard" }}
+        options={{ title: "" }}
       />
       <Stack.Screen
         name="ManageUsers"
@@ -101,7 +101,31 @@ export default function MainTabNavigator() {
   const { user } = useAuth();
 
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ color, size }) => {
+          let iconName: string;
+
+          if (route.name === "Admin") iconName = "grid-outline";
+          else if (
+            route.name === "AdminOrders" ||
+            route.name === "CustomerOrders"
+          )
+            iconName = "list-outline";
+          else if (route.name === "Products") iconName = "cube-outline";
+          else if (route.name === "ManageUsers") iconName = "people-outline";
+          else if (route.name === "Customer") iconName = "home-outline";
+          else if (route.name === "Profile") iconName = "person-outline";
+          else if (route.name === "Cart") iconName = "cart-outline";
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: "#444",
+        tabBarInactiveTintColor: "#888",
+        tabBarStyle: { backgroundColor: "#f5f5f5", borderTopWidth: 0 },
+        headerShown: true,
+      })}
+    >
       {user?.role === "admin" ? (
         <>
           <Tab.Screen
