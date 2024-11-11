@@ -11,6 +11,7 @@ import AdminDashboard from "../app/AdminScreen/AdminDashboard";
 import ManageUsersScreen from "../app/AdminScreen/ManageUsersScreen";
 import AdminOrdersScreen from "../app/AdminScreen/AdminOrdersScreen";
 import OrderDetailsScreen from "../app/AdminScreen/AdminComponents/OrderDetailsScreen";
+import AdminProductsScreen from "../app/AdminScreen/AdminProductsScreen";
 
 export type RootStackParamList = {
   AdminDashboard: undefined;
@@ -51,9 +52,9 @@ function AdminStack() {
         options={{ title: "Order Details" }}
       />
       <Stack.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{ title: "Profile" }}
+        name="Products"
+        component={AdminProductsScreen}
+        options={{ title: "Products" }}
       />
     </Stack.Navigator>
   );
@@ -112,6 +113,16 @@ export default function MainTabNavigator() {
             name="AdminOrders"
             component={AdminOrdersScreen}
             options={{ title: "Orders" }}
+          />
+          <Tab.Screen
+            name="Products"
+            component={AdminProductsScreen}
+            options={{ title: "Products" }}
+          />
+          <Tab.Screen
+            name="ManageUsers"
+            component={ManageUsersScreen}
+            options={{ title: "Manage Users" }}
           />
         </>
       ) : (

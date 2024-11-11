@@ -21,7 +21,7 @@ export const fetchOrderById = async (order_id: number) => {
       Role: "admin",
     },
   });
-}
+};
 
 export const updateOrderStatus = async (
   order_id: number,
@@ -41,12 +41,22 @@ export const updateOrderStatus = async (
   );
 };
 
-export const fetchAllProducts = async (token: string, role: string) => {
-  const headers = { Authorization: `Bearer ${token}`, role };
-  return axios.get(`${API_URL}/admin/products`, { headers });
+export const fetchAllProducts = async () => {
+  const token = await AsyncStorage.getItem("authToken");
+  return axios.get(`${API_URL}/admin/products`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Role: "admin",
+    },
+  });
 };
 
-export const fetchAllCustomers = async (token: string, role: string) => {
-  const headers = { Authorization: `Bearer ${token}`, role };
-  return axios.get(`${API_URL}/admin/users`, { headers });
+export const fetchAllCustomers = async () => {
+  const token = await AsyncStorage.getItem("authToken");
+  return axios.get(`${API_URL}/admin/users`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Role: "admin",
+    },
+  });
 };
