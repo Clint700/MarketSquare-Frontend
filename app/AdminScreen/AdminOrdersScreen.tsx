@@ -77,7 +77,9 @@ const AdminOrderScreen: React.FC = () => {
         renderItem={({ item }) => (
           <AdminOrderCard
             order={item}
-            onPress={() => navigation.navigate("OrderDetails", { order_id: item.order_id })}
+            onPress={() =>
+              navigation.navigate("OrderDetails", { order_id: item.order_id })
+            }
           />
         )}
         contentContainerStyle={styles.listContainer}
