@@ -3,9 +3,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const API_URL = "https://marketsquare-backend-6yy4.onrender.com/api";
 
-export const fetchAdminOrders = async () => {
+export const fetchAdminOrders = async (status?: string) => {
   const token = await AsyncStorage.getItem("authToken");
-  return axios.get(`${API_URL}/admin/orders`, {
+  const queryParams = status ? `?status=${status}` : "";
+  return axios.get(`${API_URL}/admin/orders${queryParams}`, {
     headers: {
       Authorization: `Bearer ${token}`,
       Role: "admin",
@@ -25,20 +26,21 @@ export const fetchOrderById = async (order_id: number) => {
 
 export const updateOrderStatus = async (
   order_id: number,
-  newStatus: string
+  updatedFields: {
+    status: string;
+    payment_status: string;
+    shipping_cost: number;
+    updated_at: Date;
+  }
 ) => {
   const token = await AsyncStorage.getItem("authToken");
 
-  return axios.patch(
-    `${API_URL}/admin/orders/${order_id}`,
-    { status: newStatus },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Role: "admin",
-      },
-    }
-  );
+  return axios.patch(`${API_URL}/admin/orders/${order_id}`, updatedFields, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Role: "admin",
+    },
+  });
 };
 
 export const fetchAllProducts = async () => {

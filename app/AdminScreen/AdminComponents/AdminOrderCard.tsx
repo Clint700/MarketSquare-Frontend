@@ -1,23 +1,12 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from "../../../navigation/MainTabNavigator";
-import { StackNavigationProp } from "@react-navigation/stack";
-
-type AdminOrderCardNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "OrderDetails"
->;
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 interface Order {
-  order_id: string;
-  user_id: string;
-  total_amount: string;
+  order_id: number;
+  full_name: string;
+  total_amount: number;
+  shipping_cost: number;
+  payment_status: string;
   status: string;
 }
 
@@ -27,31 +16,32 @@ interface AdminOrderCardProps {
 }
 
 const AdminOrderCard: React.FC<AdminOrderCardProps> = ({ order, onPress }) => {
-  const navigation = useNavigation<AdminOrderCardNavigationProp>();
-
   const getStatusStyle = () => {
     switch (order.status.toLowerCase()) {
-      case "received":
-        return styles.received;
-      case "pending":
-        return styles.pending;
+      case "processing":
+        return styles.processing;
       case "shipped":
         return styles.shipped;
       case "cancelled":
         return styles.cancelled;
+      case "completed":
+        return styles.completed;
       default:
-        return styles.pending;
+        return styles.processing;
     }
   };
 
   return (
     <TouchableOpacity style={styles.cardContainer} onPress={onPress}>
       <View style={styles.header}>
-        <Text style={styles.orderID}>Order {order.order_id}</Text>
+        <Text style={styles.orderID}>{order.full_name}</Text>
         <Text style={[styles.status, getStatusStyle()]}>{order.status}</Text>
       </View>
-      <Text style={styles.text}>User ID: {order.user_id}</Text>
       <Text style={styles.text}>Total Amount: £{order.total_amount}</Text>
+      <Text style={styles.text}>
+        Shipping Cost: £{order.shipping_cost.toFixed(2)}
+      </Text>
+      <Text style={styles.text}>Payment Status: {order.payment_status}</Text>
     </TouchableOpacity>
   );
 };
@@ -92,21 +82,9 @@ const styles = StyleSheet.create({
     color: "#fff",
     textTransform: "capitalize",
   },
-  received: {
-    backgroundColor: "#2196f3",
-  },
-  pending: {
-    backgroundColor: "#ff9800",
-  },
-  shipped: {
-    backgroundColor: "#4caf50",
-  },
-  cancelled: {
-    backgroundColor: "#f44336",
-  },
-  text: {
-    fontSize: 16,
-    color: "#555",
-    marginBottom: 5,
-  },
+  processing: { backgroundColor: "#2196f3" },
+  shipped: { backgroundColor: "#4caf50" },
+  cancelled: { backgroundColor: "#f44336" },
+  completed: { backgroundColor: "#8e44ad" },
+  text: { fontSize: 16, color: "#555", marginBottom: 5 },
 });

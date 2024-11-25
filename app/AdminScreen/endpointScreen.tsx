@@ -56,20 +56,27 @@ const EndpointScreen: React.FC = () => {
 
   const renderEndpointDetails = ({ item }: { item: [string, any] }) => {
     const [endpointPath, methods] = item;
-
+  
     return (
       <View style={styles.endpointContainer}>
         <Text style={styles.endpointPath}>
           {apiData?.base_url + endpointPath}
         </Text>
-        {Object.entries(methods).map(([method, details]) => (
-          <View key={method} style={styles.methodContainer}>
-            <Text style={styles.method}>{method}</Text>
-            <Text style={styles.description}>
-              {details.Description || "No description available"}
-            </Text>
-          </View>
-        ))}
+        {Object.entries(methods).map(([method, details]) => {
+          const typedDetails = details as {
+            Description: string;
+            [key: string]: any;
+          };
+  
+          return (
+            <View key={method} style={styles.methodContainer}>
+              <Text style={styles.method}>{method}</Text>
+              <Text style={styles.description}>
+                {typedDetails.Description || "No description available"}
+              </Text>
+            </View>
+          );
+        })}
       </View>
     );
   };
