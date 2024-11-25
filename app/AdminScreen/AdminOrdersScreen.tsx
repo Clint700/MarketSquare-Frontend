@@ -1,56 +1,122 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
-  Text,
-  StyleSheet,
   FlatList,
   ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Text,
 } from "react-native";
-import axios from "axios";
+import AdminOrderCard from "../AdminScreen/AdminComponents/AdminOrderCard";
+import { fetchAdminOrders } from "../../services/adminService";
 import { useAuth } from "../../contexts/AuthContext";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../navigation/MainTabNavigator";
 
-export default function AdminOrdersScreen() {
+type AdminOrdersScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "AdminOrders"
+>;
+
+const AdminOrderScreen: React.FC = () => {
   const { user } = useAuth();
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation<AdminOrdersScreenNavigationProp>();
 
-  useEffect(() => {
-    axios
-      .get("https://marketsquare-backend-6yy4.onrender.com/api/admin/orders", {
-        headers: { Authorization: `Bearer ${user?.token}` },
-      })
-      .then((response) => {
-        setOrders(response.data);
-      })
-      .finally(() => setLoading(false));
+  const fetchOrders = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetchAdminOrders();
+      setOrders(response.data);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      Alert.alert("Error", "Failed to load orders.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
+  useEffect(() => {
+    if (user?.role === "admin") {
+      fetchOrders();
+    } else {
+      Alert.alert("Access Denied", "Only admins can access this screen.");
+    }
+  }, [user?.role, fetchOrders]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchOrders();
+    }, [fetchOrders])
+  );
+
   if (loading) {
-    return <ActivityIndicator style={styles.loading} />;
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#4682B4" />
+        <Text style={styles.loadingText}>Loading Orders...</Text>
+      </View>
+    );
+  }
+
+  if (!orders.length) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>No Orders Found</Text>
+      </View>
+    );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>All Orders</Text>
       <FlatList
         data={orders}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.order_id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.order}>
-            <Text>Order ID: {item.id}</Text>
-            <Text>User ID: {item.user_id}</Text>
-            <Text>Status: {item.status}</Text>
-            <Text>Total: ${item.total_amount}</Text>
-          </View>
+          <AdminOrderCard
+            order={item}
+            onPress={() => navigation.navigate("OrderDetails", { order_id: item.order_id })}
+          />
         )}
+        contentContainerStyle={styles.listContainer}
       />
     </View>
   );
-}
+};
+
+export default AdminOrderScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  header: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
-  order: { padding: 15, borderBottomWidth: 1, borderBottomColor: "#ccc" },
-  loading: { flex: 1, justifyContent: "center" },
+  container: {
+    flex: 1,
+    backgroundColor: "#f8f4f0",
+    paddingHorizontal: 15,
+    paddingTop: 20,
+  },
+  listContainer: {
+    paddingBottom: 20,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#333",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyText: {
+    fontSize: 18,
+    color: "#888",
+    fontStyle: "italic",
+  },
 });

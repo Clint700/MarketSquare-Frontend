@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { login, register } from "../services/authService";
 
@@ -6,57 +12,106 @@ type AuthContextType = {
   user: any;
   role: string | null;
   signIn: (username: string, password: string) => Promise<void>;
-  signUp: (username: string,
+  signUp: (
+    username: string,
     password: string,
     firstName: string,
     lastName: string,
     email: string,
-    number: string) => Promise<void>;
+    number: string,
+    role: string,
+    address: Object,
+    preferences: Object
+  ) => Promise<void>;
   signOut: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<string | null>(null);
 
-  const signIn = (username: string, password: string) => {
-    return login(username, password)
-      .then((response) => {
-        setUser(response.data.user);
-        setRole(response.data.user.role);
-        AsyncStorage.setItem("authToken", response.data.token);
-        AsyncStorage.setItem("userRole", response.data.user.role);
-      })
-      .catch((error) => {
-        console.error("Login error:", error);
-        throw new Error("Login failed");
-      });
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const storedToken = await AsyncStorage.getItem("authToken");
+        const storedRole = await AsyncStorage.getItem("userRole");
+        const storedUser = await AsyncStorage.getItem("userData");
+
+        if (storedToken && storedRole && storedUser) {
+          setUser(JSON.parse(storedUser));
+          setRole(storedRole);
+        }
+      } catch (error) {
+        console.error("Failed to load user data from AsyncStorage:", error);
+      }
+    };
+    loadUserData();
+  }, []);
+
+  const signIn = async (username: string, password: string) => {
+    try {
+      const response = await login(username, password);
+      const userData = response.data.user;
+      const token = response.data.token;
+
+      setUser(userData);
+      setRole(userData.role);
+
+      await AsyncStorage.setItem("authToken", token);
+      await AsyncStorage.setItem("userRole", userData.role);
+      await AsyncStorage.setItem("userData", JSON.stringify(userData));
+    } catch (error) {
+      console.error("Login error:", error);
+      throw new Error("Login failed");
+    }
   };
 
-  const signUp = (
+  const signUp = async (
     username: string,
     password: string,
     firstName: string,
     lastName: string,
     email: string,
-    number: string
+    number: string,
+    role: string,
+    address: Object,
+    preferences: Object
   ) => {
-    const role = "customer"; // Default role for new sign-ups
-    return register(username, password, firstName, lastName, email, number, role).then((response) => {
-      const { user: userData, token } = response.data;
-      setUser({ ...userData, token });
-      AsyncStorage.setItem("authToken", token);
-      AsyncStorage.setItem("userRole", userData.role);
-    });
+    try {
+      const response = await register(
+        username,
+        password,
+        firstName,
+        lastName,
+        email,
+        number,
+        role,
+        address,
+        preferences
+      );
+      const userData = response.data.user;
+      const token = response.data.token;
+
+      setUser(userData);
+      setRole(role);
+
+      await AsyncStorage.setItem("authToken", token);
+      await AsyncStorage.setItem("userRole", role);
+      await AsyncStorage.setItem("userData", JSON.stringify(userData));
+    } catch (error) {
+      console.error("Signup error:", error);
+      throw new Error("Signup failed");
+    }
   };
 
-  const signOut = () => {
+  const signOut = async () => {
     setUser(null);
     setRole(null);
-    AsyncStorage.removeItem("authToken");
-    AsyncStorage.removeItem("userRole");
+    await AsyncStorage.removeItem("authToken");
+    await AsyncStorage.removeItem("userRole");
+    await AsyncStorage.removeItem("userData");
   };
 
   return (
