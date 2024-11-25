@@ -60,3 +60,7 @@ export const fetchAllCustomers = async () => {
     },
   });
 };
+
+export const fetchEndpoint = async () => {
+  return axios.get(`${API_URL}`);
+};

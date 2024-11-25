@@ -1,6 +1,8 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { useAuth } from "../contexts/AuthContext";
+import { Ionicons } from "@expo/vector-icons";
+
 import HomeScreen from "../app/customerScreen/HomeScreen";
 import ProfileScreen from "../app/customerScreen/ProfileScreen";
 import OrdersScreen from "../app/customerScreen/OrderScreen";
@@ -11,7 +13,8 @@ import ManageUsersScreen from "../app/AdminScreen/ManageUsersScreen";
 import AdminOrdersScreen from "../app/AdminScreen/AdminOrdersScreen";
 import OrderDetailsScreen from "../app/AdminScreen/AdminComponents/OrderDetailsScreen";
 import AdminProductsScreen from "../app/AdminScreen/AdminProductsScreen";
-import { Ionicons } from "@expo/vector-icons";
+import AdminProductDetailsScreen from "../app/AdminScreen/AdminComponents/AdminProductDetailsScreen";
+import EndpointScreen from "../app/AdminScreen/endpointScreen";
 
 export type RootStackParamList = {
   AdminDashboard: undefined;
@@ -20,9 +23,14 @@ export type RootStackParamList = {
   OrderDetails: { order_id: string };
   Profile: undefined;
   Home: undefined;
-  Products: undefined;
   Cart: undefined;
   CustomerOrders: undefined;
+  EndpointScreen: undefined;
+  AdminProducts: undefined;
+  AdminProductDetails: {
+    product_id: number;
+    onProductDelete: (deletedProductId: number) => void;
+  };
 };
 
 const Tab = createBottomTabNavigator();
@@ -52,9 +60,19 @@ function AdminStack() {
         options={{ title: "Order Details" }}
       />
       <Stack.Screen
-        name="Products"
+        name="AdminProducts"
         component={AdminProductsScreen}
         options={{ title: "Products" }}
+      />
+      <Stack.Screen
+        name="AdminProductDetails"
+        component={AdminProductDetailsScreen}
+        options={{ title: "Product Details" }}
+      />
+      <Stack.Screen
+        name="EndpointScreen"
+        component={EndpointScreen}
+        options={{ title: "Endpoints" }}
       />
     </Stack.Navigator>
   );
@@ -69,7 +87,7 @@ function CustomerStack() {
         options={{ title: "Home" }}
       />
       <Stack.Screen
-        name="Products"
+        name="AdminProducts"
         component={ProductsScreen}
         options={{ title: "Products" }}
       />
@@ -104,7 +122,7 @@ export default function MainTabNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
-          let iconName: string;
+          let iconName: keyof typeof Ionicons.glyphMap = "home-outline";
 
           if (route.name === "Admin") iconName = "grid-outline";
           else if (
@@ -112,7 +130,7 @@ export default function MainTabNavigator() {
             route.name === "CustomerOrders"
           )
             iconName = "list-outline";
-          else if (route.name === "Products") iconName = "cube-outline";
+          else if (route.name === "AdminProducts") iconName = "cube-outline";
           else if (route.name === "ManageUsers") iconName = "people-outline";
           else if (route.name === "Customer") iconName = "home-outline";
           else if (route.name === "Profile") iconName = "person-outline";
@@ -139,7 +157,7 @@ export default function MainTabNavigator() {
             options={{ title: "Orders" }}
           />
           <Tab.Screen
-            name="Products"
+            name="AdminProducts"
             component={AdminProductsScreen}
             options={{ title: "Products" }}
           />
@@ -147,6 +165,11 @@ export default function MainTabNavigator() {
             name="ManageUsers"
             component={ManageUsersScreen}
             options={{ title: "Manage Users" }}
+          />
+          <Tab.Screen
+            name="EndpointScreen"
+            component={EndpointScreen}
+            options={{ title: "Endpoints" }}
           />
         </>
       ) : (

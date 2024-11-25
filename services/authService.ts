@@ -24,6 +24,8 @@ export const register = (
   email: string,
   number: string,
   role: string,
+  address: Object,
+  preferences: Object
 ) => {
   return axios.post(`${API_URL}/auth/register`, {
     username,
@@ -33,6 +35,8 @@ export const register = (
     email,
     number,
     role,
+    address,
+    preferences,
   });
 };
 

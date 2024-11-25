@@ -101,7 +101,7 @@ export default ManageUsersScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f8f4f0",
     paddingHorizontal: 15,
     paddingTop: 20,
   },

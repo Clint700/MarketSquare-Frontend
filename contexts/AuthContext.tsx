@@ -18,7 +18,10 @@ type AuthContextType = {
     firstName: string,
     lastName: string,
     email: string,
-    number: string
+    number: string,
+    role: string,
+    address: Object,
+    preferences: Object
   ) => Promise<void>;
   signOut: () => void;
 };
@@ -71,7 +74,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     firstName: string,
     lastName: string,
     email: string,
-    number: string
+    number: string,
+    role: string,
+    address: Object,
+    preferences: Object
   ) => {
     try {
       const response = await register(
@@ -81,16 +87,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         lastName,
         email,
         number,
-        "customer"
+        role,
+        address,
+        preferences
       );
       const userData = response.data.user;
       const token = response.data.token;
 
       setUser(userData);
-      setRole("customer");
+      setRole(role);
 
       await AsyncStorage.setItem("authToken", token);
-      await AsyncStorage.setItem("userRole", "customer");
+      await AsyncStorage.setItem("userRole", role);
       await AsyncStorage.setItem("userData", JSON.stringify(userData));
     } catch (error) {
       console.error("Signup error:", error);
