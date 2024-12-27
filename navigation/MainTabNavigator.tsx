@@ -14,6 +14,8 @@ import AdminOrdersScreen from "../app/AdminScreen/AdminOrdersScreen";
 import OrderDetailsScreen from "../app/AdminScreen/AdminComponents/OrderDetailsScreen";
 import AdminProductsScreen from "../app/AdminScreen/AdminProductsScreen";
 import AdminProductDetailsScreen from "../app/AdminScreen/AdminComponents/AdminProductDetailsScreen";
+import AdminProductEditScreen from "../app/AdminScreen/AdminComponents/AdminProductEditScreen"; // Import Edit Screen
+import AdminProductPostScreen from "../app/AdminScreen/AdminComponents/AdminProductPostScreen"; // Import Post Screen
 import EndpointScreen from "../app/AdminScreen/endpointScreen";
 
 export type RootStackParamList = {
@@ -31,6 +33,8 @@ export type RootStackParamList = {
     product_id: number;
     onProductDelete: (deletedProductId: number) => void;
   };
+  AdminProductEdit: { product_id: number };
+  AdminProductPost: undefined;
 };
 
 const Tab = createBottomTabNavigator();
@@ -70,6 +74,16 @@ function AdminStack() {
         options={{ title: "Product Details" }}
       />
       <Stack.Screen
+        name="AdminProductEdit"
+        component={AdminProductEditScreen}
+        options={{ title: "Edit Product" }}
+      />
+      <Stack.Screen
+        name="AdminProductPost"
+        component={AdminProductPostScreen}
+        options={{ title: "Add New Product" }}
+      />
+      <Stack.Screen
         name="EndpointScreen"
         component={EndpointScreen}
         options={{ title: "Endpoints" }}
@@ -84,7 +98,7 @@ function CustomerStack() {
       <Stack.Screen
         name="Home"
         component={HomeScreen}
-        options={{ title: "Home" }}
+        options={{ title: "" }}
       />
       <Stack.Screen
         name="AdminProducts"
@@ -172,12 +186,33 @@ export default function MainTabNavigator() {
             options={{ title: "Endpoints" }}
           />
         </>
-      ) : (
+      ) : (<>
         <Tab.Screen
           name="Customer"
           component={CustomerStack}
           options={{ title: "Home" }}
         />
+        <Tab.Screen
+        name="AdminProducts"
+        component={ProductsScreen}
+        options={{ title: "Products" }}
+      />
+      <Tab.Screen
+        name="Cart"
+        component={CartScreen}
+        options={{ title: "Cart" }}
+      />
+      <Tab.Screen
+        name="CustomerOrders"
+        component={OrdersScreen}
+        options={{ title: "Orders" }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{ title: "Profile" }}
+      />
+      </>
       )}
     </Tab.Navigator>
   );

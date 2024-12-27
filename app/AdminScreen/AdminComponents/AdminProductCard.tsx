@@ -1,13 +1,5 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from "../../../navigation/MainTabNavigator";
-import { StackNavigationProp } from "@react-navigation/stack";
-
-type AdminOrderCardNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "OrderDetails"
->;
 
 interface Product {
   item_id: number;
@@ -29,46 +21,25 @@ const AdminProductCard: React.FC<AdminProductCardProps> = ({
   product,
   onPress,
 }) => {
-  const navigation = useNavigation<AdminOrderCardNavigationProp>();
-
   return (
     <TouchableOpacity style={styles.cardContainer} onPress={onPress}>
-      <View style={styles.productCard}>
-        <Image
-          source={{
-            uri: "https://www.tesco.com/groceries/en-GB/products/299876543",
-          }}
-          style={styles.productImage}
-          resizeMode="cover"
-        />
-        <View style={styles.infoContainer}>
-          <View style={styles.infoRow}>
-            <Text style={styles.productLabel}>Name:</Text>
-            <Text style={styles.productText}>{product.item_name}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.productLabel}>Category:</Text>
-            <Text style={styles.productText}>{product.category}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.productLabel}>Price:</Text>
-            <Text style={styles.productText}>${product.price}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.productLabel}>Description:</Text>
-            <Text style={styles.productText}>{product.item_description}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.productLabel}>Added by User ID:</Text>
-            <Text style={styles.productText}>{product.user_id}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.productLabel}>Created At:</Text>
-            <Text style={styles.productText}>
-              {new Date(product.created_at).toLocaleString()}
-            </Text>
-          </View>
-        </View>
+      <Image
+        source={{
+          uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBWAONkrIFA97BZfx83GoyCU9oYQI6eHdTeA&s",
+        }}
+        style={styles.productImage}
+        resizeMode="cover"
+      />
+      <View style={styles.infoContainer}>
+        <Text style={styles.productName}>{product.item_name}</Text>
+        <Text style={styles.productCategory}>{product.category}</Text>
+        <Text style={styles.productDescription} numberOfLines={2}>
+          {product.item_description}
+        </Text>
+        <Text style={styles.productPrice}>Price: £{product.price}</Text>
+        <Text style={styles.productDate}>
+          Added on {new Date(product.created_at).toLocaleDateString()}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -78,43 +49,53 @@ export default AdminProductCard;
 
 const styles = StyleSheet.create({
   cardContainer: {
-    padding: 15,
+    flexDirection: "row",
     backgroundColor: "#fff",
     borderRadius: 10,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
+    padding: 10,
+    marginVertical: 8,
+    marginHorizontal: 15,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
-  productCard: {
-    flexDirection: "row",
-  },
   productImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
+    width: 110,
+    height: 125,
+    borderRadius: 10,
     marginRight: 10,
   },
   infoContainer: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "space-between",
   },
-  infoRow: {
-    flexDirection: "row",
-    marginBottom: 5,
-  },
-  productLabel: {
+  productName: {
+    fontSize: 18,
     fontWeight: "bold",
-    fontSize: 14,
     color: "#333",
-    width: 100,
+    marginBottom: 4,
   },
-  productText: {
+  productCategory: {
     fontSize: 14,
+    fontWeight: "600",
     color: "#555",
+    marginBottom: 4,
+  },
+  productDescription: {
+    fontSize: 13,
+    color: "#777",
+    marginBottom: 8,
+  },
+  productPrice: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "#4682B4",
+  },
+  productDate: {
+    fontSize: 12,
+    color: "#888",
+    marginTop: 5,
   },
 });

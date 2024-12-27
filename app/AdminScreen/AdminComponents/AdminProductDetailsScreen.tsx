@@ -2,49 +2,60 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  ActivityIndicator,
   StyleSheet,
-  TextInput,
-  Button,
+  ActivityIndicator,
+  Image,
+  TouchableOpacity,
   Alert,
+  ScrollView,
 } from "react-native";
 import { RouteProp, useNavigation } from "@react-navigation/native";
-import {
-  fetchProductById,
-  updateProduct,
-  deleteProduct,
-} from "../../../services/adminProductService";
-import { RootStackParamList } from "../../../navigation/MainTabNavigator";
+import { fetchProductById, deleteProduct } from "../../../services/adminProductService";
+
+type Dimensions = {
+  length: string;
+  width: string;
+  height: string;
+};
+
+type Product = {
+  user_id: number;
+  img_url: string;
+  created_at: string;
+  price: string;
+  stock: number;
+  category: string;
+  item_name: string;
+  item_description: string;
+  dimensions: Dimensions;
+  rating: number;
+};
 
 type AdminProductDetailsScreenRouteProp = RouteProp<
-  RootStackParamList,
+  { AdminProductDetails: { product_id: number; onProductDelete: (id: number) => void } },
   "AdminProductDetails"
 >;
 
 interface AdminProductDetailsScreenProps {
   route: AdminProductDetailsScreenRouteProp;
+  navigation: any;
 }
 
 const AdminProductDetailsScreen: React.FC<AdminProductDetailsScreenProps> = ({
   route,
+  navigation,
 }) => {
-  const { product_id, onProductDelete } = route.params; // Get the product ID and delete callback from navigation params
-  const [product, setProduct] = useState<any>(null);
+  const { product_id, onProductDelete } = route.params;
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
-  const [updatedProduct, setUpdatedProduct] = useState<any>({});
-  const navigation = useNavigation();
 
-  // Fetch product details
   useEffect(() => {
     const loadProduct = async () => {
-      setLoading(true);
       try {
+        setLoading(true);
         const response = await fetchProductById(product_id);
         setProduct(response.data);
-        setUpdatedProduct(response.data);
       } catch (error) {
-        console.error("Error fetching product details:", error);
         Alert.alert("Error", "Failed to load product details.");
       } finally {
         setLoading(false);
@@ -54,22 +65,6 @@ const AdminProductDetailsScreen: React.FC<AdminProductDetailsScreenProps> = ({
     loadProduct();
   }, [product_id]);
 
-  // Handle product update
-  const handleUpdate = async () => {
-    try {
-      const item_id = product_id;
-      const productData = updatedProduct;
-      console.log(productData, item_id, "items")
-      await updateProduct(item_id, productData);
-      Alert.alert("Success", "Product updated successfully.");
-      setIsEditing(false);
-    } catch (error) {
-      console.error("Error updating product:", error);
-      Alert.alert("Error", "Failed to update product.");
-    }
-  };
-
-  // Handle product delete
   const handleDelete = async () => {
     Alert.alert(
       "Confirm Delete",
@@ -81,12 +76,12 @@ const AdminProductDetailsScreen: React.FC<AdminProductDetailsScreenProps> = ({
           style: "destructive",
           onPress: async () => {
             try {
-              await deleteProduct(1, product_id); // Delete product via API
-              Alert.alert("Success", "Product deleted successfully.");
-              onProductDelete(product_id); // Notify parent screen
-              navigation.goBack(); // Return to the previous screen
+              if (product) {
+                await deleteProduct(product.user_id, product_id);
+                onProductDelete(product_id);
+                navigation.goBack();
+              }
             } catch (error) {
-              console.error("Error deleting product:", error);
               Alert.alert("Error", "Failed to delete product.");
             }
           },
@@ -112,73 +107,57 @@ const AdminProductDetailsScreen: React.FC<AdminProductDetailsScreenProps> = ({
     );
   }
 
+  const { dimensions } = product;
+
   return (
-    <View style={styles.container}>
-      {!isEditing ? (
-        <>
-          <Text style={styles.label}>Product Name:</Text>
-          <Text style={styles.value}>{product.item_name}</Text>
+    <ScrollView style={styles.container}>
+       <Image
+        source={{
+          uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBWAONkrIFA97BZfx83GoyCU9oYQI6eHdTeA&s",
+        }}
+        style={styles.productImage}
+        resizeMode="cover"
+      />
+      <Text style={styles.productName}>{product.item_name}</Text>
 
-          <Text style={styles.label}>Description:</Text>
-          <Text style={styles.value}>{product.item_description}</Text>
+      <View style={styles.detailsContainer}>
+        <Text style={styles.productCategory}>{product.category}</Text>
 
-          <Text style={styles.label}>Category:</Text>
-          <Text style={styles.value}>{product.category}</Text>
+        <Text style={styles.label}>Description</Text>
+        <Text style={styles.value}>{product.item_description}</Text>
 
-          <Text style={styles.label}>Price:</Text>
-          <Text style={styles.value}>${product.price}</Text>
+        <Text style={styles.label}>Price</Text>
+        <Text style={styles.value}>£{product.price}</Text>
 
-          <View style={styles.buttonContainer}>
-            <Button title="Edit" onPress={() => setIsEditing(true)} />
-            <Button title="Delete" color="red" onPress={handleDelete} />
-          </View>
-        </>
-      ) : (
-        <>
-          <Text style={styles.label}>Product Name:</Text>
-          <TextInput
-            style={styles.input}
-            value={updatedProduct.item_name}
-            onChangeText={(text) =>
-              setUpdatedProduct({ ...updatedProduct, item_name: text })
-            }
-          />
+        <Text style={styles.label}>Stock</Text>
+        <Text style={styles.value}>{product.stock}</Text>
 
-          <Text style={styles.label}>Description:</Text>
-          <TextInput
-            style={styles.input}
-            value={updatedProduct.item_description}
-            onChangeText={(text) =>
-              setUpdatedProduct({ ...updatedProduct, item_description: text })
-            }
-          />
+        <Text style={styles.label}>Dimensions</Text>
+        <Text style={styles.value}>
+          L: {dimensions?.length} H: {dimensions?.height} W: {dimensions?.width}
+        </Text>
 
-          <Text style={styles.label}>Category:</Text>
-          <TextInput
-            style={styles.input}
-            value={updatedProduct.category}
-            onChangeText={(text) =>
-              setUpdatedProduct({ ...updatedProduct, category: text })
-            }
-          />
+        <Text style={styles.label}>Rating</Text>
+        <Text style={styles.value}>{product.rating} / 5</Text>
 
-          <Text style={styles.label}>Price:</Text>
-          <TextInput
-            style={styles.input}
-            value={updatedProduct.price}
-            onChangeText={(text) =>
-              setUpdatedProduct({ ...updatedProduct, price: text })
-            }
-            keyboardType="numeric"
-          />
+        <Text style={styles.label}>Created At</Text>
+        <Text style={styles.value}>
+          {new Date(product.created_at).toLocaleString()}
+        </Text>
+      </View>
 
-          <View style={styles.buttonContainer}>
-            <Button title="Save" onPress={handleUpdate} />
-            <Button title="Cancel" color="red" onPress={() => setIsEditing(false)} />
-          </View>
-        </>
-      )}
-    </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => navigation.navigate("AdminProductEdit", { product_id })}
+        >
+          <Text style={styles.buttonText}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+          <Text style={styles.buttonText}>Delete</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -187,30 +166,73 @@ export default AdminProductDetailsScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f9f9f9",
     padding: 20,
-    backgroundColor: "#f5f5f5",
+  },
+  productImage: {
+    width: "100%",
+    height: 250,
+    borderRadius: 12,
+    marginBottom: 15,
+  },
+  productName: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  productCategory: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 20,
+  },
+  detailsContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    marginBottom: 20,
   },
   label: {
     fontSize: 16,
     fontWeight: "bold",
-    marginTop: 10,
+    color: "#555",
+    marginBottom: 5,
   },
   value: {
     fontSize: 16,
-    marginBottom: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
-    fontSize: 16,
+    color: "#333",
+    marginBottom: 15,
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
+  },
+  editButton: {
+    flex: 1,
+    backgroundColor: "#4682B4",
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginRight: 10,
+  },
+  deleteButton: {
+    flex: 1,
+    backgroundColor: "#FF6347",
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
   loaderContainer: {
     flex: 1,
